@@ -1,8 +1,8 @@
-from django.shortcuts import render
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
@@ -15,24 +15,22 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
 
+    # Enable filtering
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["participants"]   # allows ?participants=<user_id>
+    search_fields = ["participants__email"]
+
     def get_queryset(self):
-        """Only show conversations the authenticated user is part of"""
         return Conversation.objects.filter(participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        """
-        Create a new conversation with participants.
-        Expect a list of user IDs in `participants`.
-        """
         participants = request.data.get("participants", [])
-
         if not participants or len(participants) < 2:
             return Response(
                 {"detail": "A conversation must have at least 2 participants."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Create the conversation
         conversation = Conversation.objects.create()
         conversation.participants.set(participants)
         conversation.save()
@@ -47,17 +45,16 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
 
+    # Enable filtering (e.g., ?conversation_id=<uuid>)
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ["conversation"]
+    ordering_fields = ["sent_at"]
+    ordering = ["sent_at"]
+
     def get_queryset(self):
-        """Only show messages in conversations the user is part of"""
         return Message.objects.filter(conversation__participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        """
-        Send a message to an existing conversation.
-        Requires:
-        - `conversation_id`
-        - `message_body`
-        """
         conversation_id = request.data.get("conversation_id")
         message_body = request.data.get("message_body")
 
@@ -69,7 +66,6 @@ class MessageViewSet(viewsets.ModelViewSet):
 
         conversation = get_object_or_404(Conversation, pk=conversation_id)
 
-        # Ensure the user is part of this conversation
         if request.user not in conversation.participants.all():
             return Response(
                 {"detail": "You are not a participant in this conversation."},
