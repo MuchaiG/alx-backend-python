@@ -52,17 +52,12 @@ class MessageViewSet(viewsets.ModelViewSet):
     ordering = ["sent_at"]
 
     def get_queryset(self):
-        return Message.objects.filter(conversation__participants=self.request.user)
+        conversation_id = self.kwargs.get('conversation_pk')
+        return Message.objects.filter(conversation__id=conversation_id, conversation__participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        conversation_id = request.data.get("conversation_id")
+        conversation_id = self.kwargs.get('conversation_pk')
         message_body = request.data.get("message_body")
-
-        if not conversation_id or not message_body:
-            return Response(
-                {"detail": "conversation_id and message_body are required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
         conversation = get_object_or_404(Conversation, pk=conversation_id)
 
@@ -77,6 +72,5 @@ class MessageViewSet(viewsets.ModelViewSet):
             sender=request.user,
             message_body=message_body
         )
-
         serializer = self.get_serializer(message)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
