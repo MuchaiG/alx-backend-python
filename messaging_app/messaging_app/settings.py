@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    'chats',
 ]
 
 REST_FRAMEWORK = {
@@ -53,6 +55,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+AUTH_USER_MODEL = 'chats.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
