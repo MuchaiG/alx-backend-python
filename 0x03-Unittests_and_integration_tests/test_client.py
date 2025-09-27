@@ -12,6 +12,14 @@ class TestGithubOrgClient(unittest.TestCase):
         ("google",),
         ("abc",),
     ])
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+    ])
+    def test_has_license(self, repo, license_key, expected):
+        """Test that has_license returns the correct boolean based on license key."""
+        self.assertEqual(GithubOrgClient.has_license(repo, license_key), expected)
+
     @patch("client.get_json")  # ✅ patch where it's used
     def test_org(self, org_name, mock_get_json):
         """Test that GithubOrgClient.org returns the correct value."""
@@ -70,6 +78,6 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_get_json.assert_called_once_with("https://api.github.com/orgs/google/repos")
             mock_repos_url.assert_called_once()
 
-            
+
 if __name__ == "__main__":
     unittest.main()
