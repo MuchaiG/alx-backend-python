@@ -8,6 +8,8 @@ from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.views import APIView
+from .permissions import IsOwnerOrReadOnly
+from rest_framework import filters
 # Conversation ViewSet
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -78,3 +80,11 @@ class MessageViewSet(viewsets.ModelViewSet):
 class SomeChatView(APIView):
     permission_classes = [IsOwnerOrReadOnly]
     # ...existing code...
+
+class MessageFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        conversation_id = view.kwargs.get('conversation_pk')
+        if conversation_id:
+            return queryset.filter(conversation__id=conversation_id)
+        return queryset 
+    
