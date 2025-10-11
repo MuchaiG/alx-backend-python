@@ -66,6 +66,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'chats.pagination.ChatPagination',
     'PAGE_SIZE': 20,
+    'PageNumberPagination': {'page_size': 20},
 }
 
 AUTH_USER_MODEL = 'chats.User'
