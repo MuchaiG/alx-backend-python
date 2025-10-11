@@ -14,3 +14,10 @@ class IsOwnerOrReadOnly(BasePermission):
             return True
         # Write permissions are only allowed to the owner
         return obj.owner == request.user
+        if request.method in ('PUT', 'PATCH', 'DELETE'):
+            return obj.owner == request.user
+            return True 
+
+    def has_permission(self, request, view):
+        # Allow access only to authenticated users
+        return request.user and request.user.is_authenticated
