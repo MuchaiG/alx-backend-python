@@ -6,8 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
-
-
+from .permissions import IsOwnerOrReadOnly
+from rest_framework.views import APIView
 # Conversation ViewSet
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -74,3 +74,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         )
         serializer = self.get_serializer(message)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class SomeChatView(APIView):
+    permission_classes = [IsOwnerOrReadOnly]
+    # ...existing code...
