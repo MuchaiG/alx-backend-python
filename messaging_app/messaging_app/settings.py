@@ -41,12 +41,16 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'chats',
     'django_filters',
+    'jwt_auth',
 ]
 
 REST_FRAMEWORK = {
     # Default permissions — require authentication for all API endpoints
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
 
     # Default authentication — uses session and token authentication

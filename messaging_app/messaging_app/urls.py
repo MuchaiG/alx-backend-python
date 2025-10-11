@@ -21,4 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('chats.urls')),
     path('api-auth/', include('rest_framework.urls')),
+    path('api/jwt/', include('jwt_auth.urls')),  # JWT auth endpoints
+    path('api/token/', include('jwt_auth.urls')),  # JWT auth endpoints
+    path('api/token/refresh/', include('jwt_auth.urls')),  # JWT token refresh endpoint
+    
 ]
