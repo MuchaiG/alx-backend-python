@@ -64,6 +64,8 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'chats.pagination.ChatPagination',
+    'PAGE_SIZE': 20,
 }
 
 AUTH_USER_MODEL = 'chats.User'
@@ -149,5 +151,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-DEFAULT_PAGINATION_CLASS = 'chats.pagination.ChatPagination'
-PAGE_SIZE = 20
+
